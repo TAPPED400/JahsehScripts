@@ -1,0 +1,176 @@
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local humanoid = char:WaitForChild("Humanoid")
+
+local walkSpeedValue = 200
+local jumpPowerValue = 250
+
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "WalkJumpGui"
+
+local blur = Instance.new("BlurEffect", game.Lighting)
+blur.Size = 24
+
+local loadingFrame = Instance.new("Frame", gui)
+loadingFrame.Size = UDim2.new(1, 0, 1, 0)
+loadingFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+loadingFrame.BackgroundTransparency = 0.5
+loadingFrame.ZIndex = 10
+
+local discordText = Instance.new("TextLabel", loadingFrame)
+discordText.Size = UDim2.new(0, 500, 0, 50)
+discordText.Position = UDim2.new(0.5, -250, 0.5, -25)
+discordText.BackgroundTransparency = 1
+discordText.Text = "Join Discord: discord.gg/d28AHxfKqD"
+discordText.Font = Enum.Font.SourceSansBold
+discordText.TextSize = 28
+discordText.TextColor3 = Color3.new(1, 1, 1)
+local function rainbowText(label)
+	game:GetService("RunService").RenderStepped:Connect(function()
+		label.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+	end)
+end
+
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0, 160, 0, 120)
+mainFrame.Position = UDim2.new(0, 50, 0, 150)
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+mainFrame.Active = true
+mainFrame.Draggable = true
+Instance.new("UICorner", mainFrame)
+
+local walkBtn = Instance.new("TextButton", mainFrame)
+walkBtn.Size = UDim2.new(0, 140, 0, 40)
+walkBtn.Position = UDim2.new(0, 10, 0, 10)
+walkBtn.Text = "WalkSpeed: OFF"
+walkBtn.Font = Enum.Font.SourceSansBold
+walkBtn.TextSize = 18
+walkBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", walkBtn)
+rainbowText(walkBtn)
+
+local jumpBtn = Instance.new("TextButton", mainFrame)
+jumpBtn.Size = UDim2.new(0, 140, 0, 40)
+jumpBtn.Position = UDim2.new(0, 10, 0, 60)
+jumpBtn.Text = "JumpPower: Disabled"
+jumpBtn.Font = Enum.Font.SourceSansBold
+jumpBtn.TextSize = 18
+jumpBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", jumpBtn)
+rainbowText(jumpBtn)
+
+local walkEnabled = false
+
+walkBtn.MouseButton1Click:Connect(function()
+	walkEnabled = not walkEnabled
+	if walkEnabled then
+		humanoid.WalkSpeed = walkSpeedValue
+		walkBtn.Text = "WalkSpeed: ON"
+	else
+		humanoid.WalkSpeed = 16
+		walkBtn.Text = "WalkSpeed: OFF"
+	end
+end)
+
+jumpBtn.MouseButton1Click:Connect(function()
+	jumpBtn.Text = "JumpPower: Disabled (Fixing Soon)"
+end)
+local customFrame = Instance.new("Frame", gui)
+customFrame.Size = UDim2.new(0, 180, 0, 180)
+customFrame.Position = UDim2.new(0, 250, 0, 150)
+customFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+customFrame.Active = true
+customFrame.Draggable = true
+Instance.new("UICorner", customFrame)
+
+local title = Instance.new("TextLabel", customFrame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "Customize Values"
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 20
+rainbowText(title)
+
+local walkLabel = Instance.new("TextLabel", customFrame)
+walkLabel.Position = UDim2.new(0, 10, 0, 35)
+walkLabel.Size = UDim2.new(0, 160, 0, 20)
+walkLabel.BackgroundTransparency = 1
+walkLabel.Text = "WalkSpeed:"
+walkLabel.TextColor3 = Color3.new(1, 1, 1)
+walkLabel.Font = Enum.Font.SourceSans
+walkLabel.TextSize = 16
+
+local walkBox = Instance.new("TextBox", customFrame)
+walkBox.Position = UDim2.new(0, 10, 0, 60)
+walkBox.Size = UDim2.new(0, 160, 0, 30)
+walkBox.Text = tostring(walkSpeedValue)
+walkBox.Font = Enum.Font.SourceSans
+walkBox.TextSize = 18
+Instance.new("UICorner", walkBox)
+
+local jumpLabel = Instance.new("TextLabel", customFrame)
+jumpLabel.Position = UDim2.new(0, 10, 0, 95)
+jumpLabel.Size = UDim2.new(0, 160, 0, 20)
+jumpLabel.BackgroundTransparency = 1
+jumpLabel.Text = "JumpPower:"
+jumpLabel.TextColor3 = Color3.new(1, 1, 1)
+jumpLabel.Font = Enum.Font.SourceSans
+jumpLabel.TextSize = 16
+
+local jumpBox = Instance.new("TextBox", customFrame)
+jumpBox.Position = UDim2.new(0, 10, 0, 120)
+jumpBox.Size = UDim2.new(0, 160, 0, 30)
+jumpBox.Text = tostring(jumpPowerValue)
+jumpBox.Font = Enum.Font.SourceSans
+jumpBox.TextSize = 18
+Instance.new("UICorner", jumpBox)
+
+local applyBtn = Instance.new("TextButton", customFrame)
+applyBtn.Position = UDim2.new(0, 10, 0, 155)
+applyBtn.Size = UDim2.new(0, 160, 0, 20)
+applyBtn.Text = "Apply"
+applyBtn.Font = Enum.Font.SourceSansBold
+applyBtn.TextSize = 16
+applyBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+applyBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", applyBtn)
+
+applyBtn.MouseButton1Click:Connect(function()
+	local ws = tonumber(walkBox.Text)
+	local jp = tonumber(jumpBox.Text)
+	if ws then walkSpeedValue = ws end
+	if jp then jumpPowerValue = jp end
+
+	if walkEnabled then humanoid.WalkSpeed = walkSpeedValue end
+end)
+local lighting = game:GetService("Lighting")
+local blur = Instance.new("BlurEffect", lighting)
+blur.Size = 24
+
+local loadFrame = Instance.new("Frame", gui)
+loadFrame.Size = UDim2.new(1, 0, 1, 0)
+loadFrame.Position = UDim2.new(0, 0, 0, 0)
+loadFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+loadFrame.BackgroundTransparency = 0.4
+loadFrame.ZIndex = 999
+
+local discordLabel = Instance.new("TextLabel", loadFrame)
+discordLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+discordLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+discordLabel.Size = UDim2.new(0, 400, 0, 50)
+discordLabel.BackgroundTransparency = 1
+discordLabel.Text = "Join Discord: discord.gg/d28AHxfKqD"
+discordLabel.Font = Enum.Font.SourceSansBold
+discordLabel.TextSize = 28
+discordLabel.TextColor3 = Color3.new(1, 1, 1)
+discordLabel.ZIndex = 1000
+
+task.delay(3, function()
+	for i = 0, 1, 0.05 do
+		loadFrame.BackgroundTransparency = 0.4 + (i * 0.6)
+		discordLabel.TextTransparency = i
+		task.wait(0.02)
+	end
+	loadFrame:Destroy()
+	blur:Destroy()
+end)
