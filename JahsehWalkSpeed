@@ -54,9 +54,10 @@ task.delay(3, function()
 	gui.ResetOnSpawn = false
 
 	local walkSpeed = 500
+	local defaultSpeed = 16
 	local jumpPower = 120
 	local walkEnabled = true
-	local jumpEnabled = false
+	local jumpEnabled = true
 
 	local function rainbowText(obj)
 		runService.RenderStepped:Connect(function()
@@ -88,12 +89,36 @@ task.delay(3, function()
 	local toggleBtn = createDraggableButton("ToggleCustomizer", UDim2.new(0, 50, 0, 200), "Open Customizer")
 
 	local customFrame = Instance.new("Frame", gui)
-	customFrame.Size = UDim2.new(0, 220, 0, 160)
-	customFrame.Position = UDim2.new(0.5, -110, 0.5, -80)
+	customFrame.Size = UDim2.new(0, 220, 0, 200)
+	customFrame.Position = UDim2.new(0.5, -110, 0.5, -100)
 	customFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	customFrame.Visible = false
-	Instance.new("UICorner", customFrame)
 	rainbowText(customFrame)
+	Instance.new("UICorner", customFrame)
+
+	local dragging = false
+	local offset
+
+	toggleBtn.MouseButton1Down:Connect(function(input)
+		dragging = true
+		offset = Vector2.new(input.Position.X - toggleBtn.Position.X.Offset, input.Position.Y - toggleBtn.Position.Y.Offset)
+	end)
+
+	game:GetService("UserInputService").InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = false
+		end
+	end)
+
+	runService.RenderStepped:Connect(function()
+		if dragging then
+			local mouse = game:GetService("UserInputService"):GetMouseLocation()
+			local newX = mouse.X - offset.X
+			local newY = mouse.Y - offset.Y
+			toggleBtn.Position = UDim2.new(0, newX, 0, newY)
+			customFrame.Position = toggleBtn.Position + UDim2.new(0, 0, 0, 40)
+		end
+	end)
 
 	local function createInputField(placeholder, y)
 		local input = Instance.new("TextBox", customFrame)
@@ -110,10 +135,11 @@ task.delay(3, function()
 
 	local wsInput = createInputField("WalkSpeed (e.g. 500)", 20)
 	local jpInput = createInputField("JumpPower (e.g. 120)", 60)
+	local defaultWSInput = createInputField("Default Speed (e.g. 16)", 100)
 
 	local applyBtn = Instance.new("TextButton", customFrame)
 	applyBtn.Size = UDim2.new(0, 180, 0, 30)
-	applyBtn.Position = UDim2.new(0, 20, 0, 110)
+	applyBtn.Position = UDim2.new(0, 20, 0, 150)
 	applyBtn.Text = "Apply Settings"
 	applyBtn.Font = Enum.Font.SourceSansBold
 	applyBtn.TextSize = 16
@@ -122,7 +148,6 @@ task.delay(3, function()
 	rainbowText(applyBtn)
 
 	toggleBtn.MouseButton1Click:Connect(function()
-		customFrame.Position = UDim2.new(0.5, -110, 0.5, -80) -- Center on screen
 		customFrame.Visible = not customFrame.Visible
 		toggleBtn.Text = customFrame.Visible and "Close Customizer" or "Open Customizer"
 	end)
@@ -150,11 +175,15 @@ task.delay(3, function()
 	applyBtn.MouseButton1Click:Connect(function()
 		local ws = tonumber(wsInput.Text)
 		local jp = tonumber(jpInput.Text)
+		local ds = tonumber(defaultWSInput.Text)
+
 		if ws then walkSpeed = ws end
 		if jp then jumpPower = jp end
+		if ds then defaultSpeed = ds end
+
 		local hum = player.Character and player.Character:FindFirstChildWhichIsA("Humanoid")
 		if hum then
-			hum.WalkSpeed = walkEnabled and walkSpeed or 16
+			hum.WalkSpeed = walkEnabled and walkSpeed or defaultSpeed
 			hum.JumpPower = jumpEnabled and jumpPower or 50
 		end
 	end)
@@ -162,7 +191,7 @@ task.delay(3, function()
 	runService.RenderStepped:Connect(function()
 		local hum = player.Character and player.Character:FindFirstChildWhichIsA("Humanoid")
 		if hum then
-			hum.WalkSpeed = walkEnabled and walkSpeed or 16
+			hum.WalkSpeed = walkEnabled and walkSpeed or defaultSpeed
 			hum.JumpPower = jumpEnabled and jumpPower or 50
 		end
 	end)
